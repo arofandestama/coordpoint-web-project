@@ -8,7 +8,7 @@
  *
  * Hero highlights: aurora blobs with mouse parallax, drifting particles,
  * animated perspective grid floor, radar-sweep + orbiting satellite marker,
- * live DMS→DD conversion ticker, staggered word reveal with blur, and
+ * live DMS to DD conversion ticker, staggered word reveal with blur, and
  * count-up statistics.
  */
 import dynamic from 'next/dynamic';
@@ -56,6 +56,12 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
+/**
+ * Properties for the {@link LandingPage} component.
+ *
+ * @interface LandingPageProps
+ * @property {() => void} onLaunch - Callback triggered when the user clicks a button to navigate to the interactive map workspace.
+ */
 export interface LandingPageProps {
   onLaunch: () => void;
 }
@@ -548,6 +554,15 @@ function LandmarkCard({ item }: { item: (typeof LANDMARK_DATASETS)[number] }) {
   );
 }
 
+/**
+ * Main Landing Page component featuring an interactive dark-ocean hero section,
+ * 3D Earth model, geodesic precision matrices, and landmark benchmarks.
+ *
+ * @component
+ * @param {LandingPageProps} props - Component properties.
+ * @param {() => void} props.onLaunch - Callback function invoked when launching the map workspace.
+ * @returns {JSX.Element} The rendered Landing Page UI.
+ */
 export default function LandingPage({ onLaunch }: LandingPageProps) {
   const shouldReduceMotion = useReducedMotion();
 

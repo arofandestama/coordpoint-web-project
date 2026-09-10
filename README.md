@@ -4,7 +4,7 @@ Aplikasi web modern berbasis **Next.js 16 (React 19) + TypeScript + OpenLayers**
 
 ---
 
-## ⚡ 1. VERSI RINGKAS (QUICK START GUIDE)
+## 1. VERSI RINGKAS (QUICK START GUIDE)
 
 Petunjuk praktis untuk pengguna yang ingin langsung mencoba aplikasi dan pengujian:
 
@@ -17,11 +17,11 @@ Petunjuk praktis untuk pengguna yang ingin langsung mencoba aplikasi dan penguji
 
 ---
 
-## 📖 2. PANDUAN LENGKAP & DETAIL
+## 2. PANDUAN LENGKAP & DETAIL
 
 ---
 
-### 📋 Prasyarat Sistem
+### Prasyarat Sistem
 
 Sebelum memulai instalasi, pastikan lingkungan sistem Anda memenuhi spesifikasi berikut:
 
@@ -32,7 +32,7 @@ Sebelum memulai instalasi, pastikan lingkungan sistem Anda memenuhi spesifikasi 
 
 ---
 
-### 📦 Langkah Instalasi & Pengoperasian
+### Langkah Instalasi & Pengoperasian
 
 #### 1. Kloning Repositori
 Buka terminal shell dan jalankan perintah:
@@ -56,7 +56,7 @@ Buka browser Anda dan navigasikan ke `http://localhost:3000`.
 
 ---
 
-### 🧪 Panduan Lengkap Pengujian (Unit Testing)
+### Panduan Lengkap Pengujian (Unit Testing)
 
 Aplikasi CoordPoint dilengkapi dengan pengujian unit komprehensif menggunakan **Jest 30** dan **React Testing Library** yang mencakup 40 kasus uji matematis geodesi.
 
@@ -96,7 +96,7 @@ Time:        0.727 s
 
 ---
 
-### 📏 Standar Clean Code & JSDoc Documentation
+### Standar Clean Code & JSDoc Documentation
 
 Aplikasi ini menggunakan standar penulisan **Clean Code TypeScript React** dan dokumentasi **JSDoc resmi** ([https://jsdoc.app/about-getting-started](https://jsdoc.app/about-getting-started)):
 
@@ -106,7 +106,7 @@ Aplikasi ini menggunakan standar penulisan **Clean Code TypeScript React** dan d
 
 ---
 
-### 🚀 Best Practices Optimasi Performa 3D WebGL (Earth Modeling)
+### Best Practices Optimasi Performa 3D WebGL (Earth Modeling)
 
 Untuk memastikan pengolahan grafik 3D di browser berjalan sangat cepat tanpa mengalami **Input Delay** (~453ms):
 
@@ -123,7 +123,7 @@ Untuk memastikan pengolahan grafik 3D di browser berjalan sangat cepat tanpa men
 
 ---
 
-### 🛠️ Perintah Utama (Summary Commands)
+### Perintah Utama (Summary Commands)
 
 | Perintah | Deskripsi |
 | :--- | :--- |
@@ -137,7 +137,7 @@ Untuk memastikan pengolahan grafik 3D di browser berjalan sangat cepat tanpa men
 
 ---
 
-## 📂 Struktur Folder
+## Struktur Folder
 
 ```
 coordpoint/
@@ -161,7 +161,7 @@ coordpoint/
 │   │   │   └── FloatingButton.tsx  # Tombol mengambang pembuka panel
 │   │   └── ui/                     # Komponen shadcn/ui
 │   ├── lib/
-│   │   ├── coordinates/            # ⭐ Library konversi murni (testable)
+│   │   ├── coordinates/            # Star Library konversi murni (testable)
 │   │   │   ├── types.ts            #   Tipe & CoordinateValidationError
 │   │   │   ├── validate.ts         #   assertValidDms / assertValidDd
 │   │   │   ├── dms-to-dd.ts        #   dmsToDd / formatDd
@@ -182,7 +182,7 @@ sedangkan seluruh interaksi OpenLayers dibungkus satu class `MapService`.
 
 ---
 
-## 📐 Dokumentasi Perancangan
+## Dokumentasi Perancangan
 
 Dokumentasi perancangan melengkapi activity diagram & component diagram yang
 sudah ada dengan **class diagram** dan **sequence diagram**:
@@ -231,7 +231,7 @@ classDiagram
 
 ---
 
-## 🧭 Cara Menggunakan Aplikasi
+## Cara Menggunakan Aplikasi
 
 1. Dari landing page, tekan **Buka Peta**.
 2. Peta OpenStreetMap terbuka dengan tombol mengambang biru di kanan atas
@@ -245,7 +245,7 @@ classDiagram
 
 ---
 
-## 🧹 Clean Code
+## Clean Code
 
 - **TypeScript strict** — tanpa `any`, tipe eksplisit untuk semua API publik.
 - **JSDoc** — seluruh fungsi library & service terdokumentasi (`@param`, `@returns`, `@throws`, `@example`).
@@ -255,6 +255,6 @@ classDiagram
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 
 Data peta © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright).

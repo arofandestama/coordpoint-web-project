@@ -4,8 +4,8 @@
  * ConversionPanel — floating card displayed above the map.
  *
  * Contains two tabs:
- * - "DMS to DD": input derajat, menit, detik + arah (N/S dan E/W) → hasil Decimal Degrees.
- * - "DD to DMS": input derajat desimal → hasil Derajat-Menit-Detik dengan arah.
+ * - "DMS to DD": input derajat, menit, detik + arah (N/S dan E/W) menghasilkan Decimal Degrees.
+ * - "DD to DMS": input derajat desimal menghasilkan Derajat-Menit-Detik dengan arah.
  *
  * Hasil konversi dapat langsung ditambahkan ke peta melalui tombol "Add To Maps".
  */
