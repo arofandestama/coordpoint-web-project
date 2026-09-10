@@ -15,13 +15,13 @@
  * Everything is sized to stay inside the transparent canvas so no container
  * edges are ever visible against the hero background.
  */
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Component, Suspense, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
 /** Normalized earth radius used by every scene element. */
-const EARTH_RADIUS = 1.5;
+const EARTH_RADIUS = 1.6;
 
 /** Coordinate pins placed at the app's conversion sample locations. */
 const SAMPLE_POINTS = [
@@ -196,9 +196,9 @@ function OrbitRings() {
 
   // Radii kept inside the camera frustum so rings never clip at canvas edges.
   const rings = [
-    { radius: 1.85, tilt: 0.45, speed: 0.5, color: '#90e0ef' },
-    { radius: 2.05, tilt: -0.3, speed: -0.32, color: '#00b4d8' },
-    { radius: 2.25, tilt: 0.85, speed: 0.22, color: '#caf0f8' },
+    { radius: 1.95, tilt: 0.45, speed: 0.5, color: '#90e0ef' },
+    { radius: 2.15, tilt: -0.3, speed: -0.32, color: '#00b4d8' },
+    { radius: 2.35, tilt: 0.85, speed: 0.22, color: '#caf0f8' },
   ] as const;
 
   return (
@@ -223,7 +223,7 @@ function BackGlow() {
     [],
   );
   return (
-    <sprite position={[0, 0, -1.2]} scale={4.4}>
+    <sprite position={[0, 0, -1.2]} scale={4.8}>
       <spriteMaterial
         map={glow}
         transparent
@@ -320,6 +320,20 @@ function GlobeFallback() {
   );
 }
 
+/** Error boundary so a failed model fetch never crashes the page. */
+class SceneErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError(): { failed: boolean } {
+    return { failed: true };
+  }
+
+  render() {
+    if (this.state.failed) return null;
+    return this.props.children;
+  }
+}
+
 /**
  * Hero 3D globe canvas.
  *
@@ -338,12 +352,14 @@ export default function EarthGlobe({ className }: EarthGlobeProps) {
         <directionalLight position={[6, 4, 6]} intensity={1.3} color="#caf0f8" />
         <directionalLight position={[-6, -2, -4]} intensity={0.5} color="#0077b6" />
         <Suspense fallback={<GlobeFallback />}>
-          <Rig>
-            <BackGlow />
-            <Earth />
-            <OrbitRings />
-            <Starfield />
-          </Rig>
+          <SceneErrorBoundary>
+            <Rig>
+              <BackGlow />
+              <Earth />
+              <OrbitRings />
+              <Starfield />
+            </Rig>
+          </SceneErrorBoundary>
         </Suspense>
       </Canvas>
     </div>

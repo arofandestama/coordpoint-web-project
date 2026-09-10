@@ -315,7 +315,7 @@ function GridFloor() {
   );
 }
 
-function HeroVisual() {
+function HeroVisual({ className }: { className?: string }) {
   const shouldReduceMotion = useReducedMotion();
   const [tick, setTick] = useState(0);
 
@@ -333,23 +333,14 @@ function HeroVisual() {
       initial={{ opacity: 0, y: 28, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
-      className="relative isolate"
+      className={className}
     >
-      {/* Ambient glow behind the globe */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -inset-10 -z-10 rounded-full bg-[radial-gradient(60%_60%_at_50%_45%,rgba(0,180,216,0.45),transparent)] blur-3xl"
-      />
-
-      {/* 3D Earth (glTF model, client-only) */}
-      <EarthGlobe className="relative aspect-square w-full max-w-[640px] mx-auto" />
-
       {/* Floating card: live DMS → DD ticker */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7, duration: 0.5, ease: 'easeOut' }}
-        className="absolute -left-3 bottom-8 sm:-left-6"
+        className="absolute bottom-[16%] right-[8%] hidden sm:block"
       >
         <motion.div
           animate={shouldReduceMotion ? undefined : { y: [0, -7, 0] }}
@@ -386,7 +377,7 @@ function HeroVisual() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.85, duration: 0.5, ease: 'easeOut' }}
-        className="absolute -right-2 top-8 sm:-right-5"
+        className="absolute right-[5%] top-[18%] hidden lg:block"
       >
         <motion.div
           animate={shouldReduceMotion ? undefined : { y: [0, 8, 0] }}
@@ -408,7 +399,7 @@ function HeroVisual() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.5, ease: 'easeOut' }}
-        className="absolute bottom-4 right-6 hidden sm:block"
+        className="absolute bottom-[7%] right-[26%] hidden lg:block"
       >
         <motion.div
           animate={shouldReduceMotion ? undefined : { y: [0, -5, 0] }}
@@ -433,7 +424,7 @@ interface DocCardProps {
 
 function DocCard({ icon: Icon, title, subtitle, diagramId, chart }: DocCardProps) {
   return (
-    <Card className="h-full gap-0 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <Card className="h-full gap-0 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-[#0077b6] ring-1 ring-sky-100">
@@ -466,8 +457,6 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
   const blobsX = useTransform(springX, (v) => v * -36);
   const blobsY = useTransform(springY, (v) => v * -24);
-  const visualX = useTransform(springX, (v) => v * 22);
-  const visualY = useTransform(springY, (v) => v * 14);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     if (shouldReduceMotion) return;
@@ -483,7 +472,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
-      {/* ── Navbar ─────────────────────────────────────────────────────── */}
+      {/* -- Navbar ------------------------------------------------------- */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#03045e]/75 backdrop-blur-md">
         <div className={cn(CONTAINER, 'flex h-14 items-center justify-between gap-4')}>
           <div className="flex items-center gap-2.5">
@@ -499,7 +488,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 key={link.id}
                 type="button"
                 onClick={() => scrollToSection(link.id)}
-                className="text-sm font-medium text-[#caf0f8]/70 transition-colors hover:text-white"
+                className="text-sm font-medium text-white/90 transition-colors hover:text-white"
               >
                 {link.label}
               </button>
@@ -517,7 +506,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
       </header>
 
       <main className="flex-1">
-        {/* ── Hero ─────────────────────────────────────────────────────── */}
+        {/* -- Hero ------------------------------------------------------- */}
         <section
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
@@ -537,10 +526,18 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
           <Particles />
           <GridFloor />
 
+          {/* 3D Earth backdrop — besar, di belakang headline */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
+          >
+            <EarthGlobe className="aspect-square w-[min(72rem,150vw)]" />
+          </div>
+
           <div
             className={cn(
               CONTAINER,
-              'relative z-10 grid min-h-[88vh] grid-cols-1 items-center gap-14 pb-24 pt-32 sm:pt-36 lg:grid-cols-[1fr_1.1fr] lg:gap-8',
+              'relative z-10 flex min-h-[88vh] items-center pb-16 pt-24 sm:pb-20 sm:pt-28',
             )}
           >
             <motion.div
@@ -586,7 +583,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 <Button
                   type="button"
                   onClick={onLaunch}
-                  className="group relative h-12 gap-3 overflow-hidden rounded-full bg-gradient-to-r from-[#00b4d8] to-[#0077b6] px-9 text-base font-semibold text-white shadow-lg shadow-[#00b4d8]/30 transition-all hover:shadow-xl hover:shadow-[#00b4d8]/40"
+                  className="group relative h-12 gap-4 overflow-hidden rounded-full bg-gradient-to-r from-[#00b4d8] to-[#0077b6] px-10 text-base font-semibold text-white shadow-lg shadow-[#00b4d8]/30 transition-all hover:shadow-xl hover:shadow-[#00b4d8]/40"
                 >
                   <span
                     aria-hidden="true"
@@ -621,10 +618,10 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
               </motion.ul>
             </motion.div>
 
-            <motion.div style={{ x: visualX, y: visualY }}>
-              <HeroVisual />
-            </motion.div>
           </div>
+
+          {/* Kartu pendukung — boleh menimpa globe */}
+          <HeroVisual className="pointer-events-none absolute inset-0 z-10" />
 
           {/* Scroll cue */}
           <motion.div
@@ -637,8 +634,8 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
           </motion.div>
         </section>
 
-        {/* ── Features ─────────────────────────────────────────────────── */}
-        <section id="fitur" aria-labelledby="fitur-title" className="scroll-mt-24 py-16 sm:py-24">
+        {/* -- Features --------------------------------------------------- */}
+        <section id="fitur" aria-labelledby="fitur-title" className="scroll-mt-24 py-14 sm:py-20">
           <div className={CONTAINER}>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={staggerContainer}>
               <motion.div variants={fadeUp}>
@@ -650,13 +647,13 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 />
               </motion.div>
 
-              <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {FEATURES.map((feature) => {
                   const { icon: Icon, title, description } = feature;
                   return (
                     <motion.div key={title} variants={fadeUp} className="min-w-0">
-                      <Card className="group h-full gap-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-md hover:shadow-sky-100">
-                        <span className="flex size-11 items-center justify-center rounded-xl bg-sky-50 text-[#0077b6] ring-1 ring-sky-100 transition-colors duration-300 group-hover:bg-[#0077b6] group-hover:text-white">
+                      <Card className="group relative h-full gap-0 overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#90e0ef]/60 hover:shadow-lg hover:shadow-sky-100">
+                        <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-50 to-[#90e0ef]/30 text-[#0077b6] ring-1 ring-sky-100 transition-all duration-300 group-hover:from-[#00b4d8] group-hover:to-[#0077b6] group-hover:text-white group-hover:shadow-lg group-hover:shadow-[#00b4d8]/30">
                           <Icon className="size-5" aria-hidden="true" />
                         </span>
                         <h3 className="mt-5 text-base font-semibold text-slate-900">{title}</h3>
@@ -670,11 +667,11 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ── How it works ─────────────────────────────────────────────── */}
+        {/* -- How it works ----------------------------------------------- */}
         <section
           id="cara-kerja"
           aria-labelledby="cara-kerja-title"
-          className="scroll-mt-24 border-y border-slate-100 bg-slate-50/70 py-16 sm:py-24"
+          className="scroll-mt-24 border-y border-slate-100 bg-slate-50/70 py-14 sm:py-20"
         >
           <div className={CONTAINER}>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={staggerContainer}>
@@ -687,22 +684,24 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 />
               </motion.div>
 
-              <div className="relative mt-14">
+              <div className="relative mt-12">
                 <div
                   aria-hidden="true"
-                  className="absolute inset-x-24 top-6 hidden border-t-2 border-dashed border-[#90e0ef]/60 lg:block"
+                  className="absolute inset-x-24 top-10 hidden border-t-2 border-dashed border-[#90e0ef]/60 lg:block"
                 />
-                <div className="grid grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-8">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6">
                   {STEPS.map((step) => (
                     <motion.div key={step.number} variants={fadeUp} className="relative">
-                      <span
-                        aria-hidden="true"
-                        className="relative z-10 inline-block select-none text-5xl font-bold leading-none text-[#90e0ef]"
-                      >
-                        {step.number}
-                      </span>
-                      <h3 className="mt-5 text-lg font-semibold text-slate-900">{step.title}</h3>
-                      <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-600">{step.description}</p>
+                      <div className="h-full rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#90e0ef]/60 hover:shadow-lg hover:shadow-sky-100">
+                        <span
+                          aria-hidden="true"
+                          className="inline-block select-none text-5xl font-bold leading-none text-[#90e0ef]"
+                        >
+                          {step.number}
+                        </span>
+                        <h3 className="mt-4 text-lg font-semibold text-slate-900">{step.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-600">{step.description}</p>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
@@ -711,8 +710,8 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ── Documentation ────────────────────────────────────────────── */}
-        <section id="dokumentasi" aria-labelledby="dokumentasi-title" className="scroll-mt-24 py-16 sm:py-24">
+        {/* -- Documentation ---------------------------------------------- */}
+        <section id="dokumentasi" aria-labelledby="dokumentasi-title" className="scroll-mt-24 py-14 sm:py-20">
           <div className={CONTAINER}>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={staggerContainer}>
               <motion.div variants={fadeUp}>
@@ -748,15 +747,15 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ── CTA band ─────────────────────────────────────────────────── */}
-        <section className="pb-20 sm:pb-24">
+        {/* -- CTA band --------------------------------------------------- */}
+        <section className="pb-14 sm:pb-16">
           <div className={CONTAINER}>
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="relative isolate overflow-hidden rounded-3xl bg-[#03045e] px-6 py-14 text-center sm:px-14 sm:py-20"
+              className="relative isolate overflow-hidden rounded-3xl bg-[#03045e] px-6 py-12 text-center sm:px-14 sm:py-16"
             >
               <div
                 aria-hidden="true"
@@ -782,7 +781,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 <Button
                   type="button"
                   onClick={onLaunch}
-                  className="group relative h-12 gap-3 overflow-hidden rounded-full bg-gradient-to-r from-[#00b4d8] to-[#90e0ef] px-10 text-base font-semibold text-[#03045e] shadow-lg shadow-[#00b4d8]/30 transition-all hover:shadow-xl hover:shadow-[#00b4d8]/40"
+                  className="group relative h-12 gap-4 overflow-hidden rounded-full bg-gradient-to-r from-[#00b4d8] to-[#90e0ef] px-12 text-base font-semibold text-[#03045e] shadow-lg shadow-[#00b4d8]/30 transition-all hover:shadow-xl hover:shadow-[#00b4d8]/40"
                 >
                   <span
                     aria-hidden="true"
@@ -800,41 +799,89 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
         </section>
       </main>
 
-      {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer className="mt-auto border-t border-slate-200/70 bg-white">
-        <div className={cn(CONTAINER, 'flex flex-col gap-8 py-10 md:flex-row md:items-center md:justify-between')}>
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#00b4d8] to-[#0077b6] text-white">
-              <MapPin className="size-3.5" aria-hidden="true" />
-            </span>
+      {/* -- Footer ------------------------------------------------------- */}
+      <footer className="mt-auto border-t border-slate-200/70 bg-slate-50">
+        <div className={cn(CONTAINER, 'py-10')}>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-[1.6fr_1fr_1fr]">
             <div>
-              <p className="text-sm font-semibold text-slate-900">CoordPoint</p>
-              <p className="mt-1 max-w-xs text-sm text-slate-500">
-                Konversi koordinat DMS ⇄ DD langsung di atas peta OpenStreetMap.
+              <div className="flex items-center gap-2.5">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#00b4d8] to-[#0077b6] shadow-lg shadow-[#00b4d8]/25">
+                  <MapPin className="size-4 text-white" aria-hidden="true" />
+                </span>
+                <span className="text-base font-semibold tracking-tight text-slate-900">CoordPoint</span>
+              </div>
+              <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-500">
+                Ubah koordinat Derajat-Menit-Detik menjadi Decimal Degrees — dan sebaliknya —
+                langsung di atas peta OpenStreetMap.
+              </p>
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 font-mono text-[11px] text-slate-500">
+                <span aria-hidden="true" className="size-2 rounded-full bg-[#00b4d8]" />
+                Pusat peta default: 6.20000° S, 106.82778° E · Zoom 10
               </p>
             </div>
+
+            <nav aria-label="Tautan halaman">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Jelajahi</p>
+              <ul className="mt-3 space-y-2">
+                {NAV_LINKS.map((link) => (
+                  <li key={link.id}>
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection(link.id)}
+                      className="text-sm text-slate-600 transition-colors hover:text-slate-900"
+                    >
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <nav aria-label="Sumber daya">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Sumber Daya</p>
+              <ul className="mt-3 space-y-2.5">
+                <li>
+                  <a
+                    href="https://openlayers.org"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-slate-600 transition-colors hover:text-slate-900"
+                  >
+                    OpenLayers Docs
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.openstreetmap.org"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-slate-600 transition-colors hover:text-slate-900"
+                  >
+                    OpenStreetMap
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.openstreetmap.org/copyright"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-slate-600 transition-colors hover:text-slate-900"
+                  >
+                    Lisensi Data Peta
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
 
-          <nav aria-label="Tautan eksternal" className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <a
-              href="https://openlayers.org"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-slate-500 transition-colors hover:text-slate-900"
-            >
-              OpenLayers Docs
-            </a>
-            <a
-              href="https://www.openstreetmap.org/copyright"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-slate-500 transition-colors hover:text-slate-900"
-            >
-              © OpenStreetMap
-            </a>
-          </nav>
+          <Separator className="my-6" />
 
-          <p className="text-sm text-slate-400">© {new Date().getFullYear()} CoordPoint</p>
+          <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
+            <p className="text-xs text-slate-400">
+              © {new Date().getFullYear()} CoordPoint · Data peta © OpenStreetMap contributors
+            </p>
+            <p className="font-mono text-[11px] text-slate-400">DMS ⇄ DD · presisi 5 desimal</p>
+          </div>
         </div>
       </footer>
     </div>
