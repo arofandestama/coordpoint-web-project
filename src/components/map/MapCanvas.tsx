@@ -1,12 +1,10 @@
 'use client';
 
 /**
- * MapCanvas — renders the OpenLayers map into a full-size container and
- * exposes the {@link MapService} instance plus center-change events to the
- * parent workspace component.
+ * @module MapCanvas
+ * @description Renders the OpenLayers tile canvas container and bridges events with {@link MapService}.
  *
- * This component is intentionally rendered with `ssr: false` from the page
- * because OpenLayers requires a real browser DOM.
+ * @see {@link MapService}
  */
 import { useEffect, useRef } from 'react';
 

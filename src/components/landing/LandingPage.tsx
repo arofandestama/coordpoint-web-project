@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * LandingPage — immersive dark-ocean themed landing with a motion-rich hero.
+ * LandingPage: Immersive dark-ocean themed landing with a motion-rich hero.
  *
  * Palette (built around #90e0ef):
  *   #03045e (deep navy base) · #023e8a · #0077b6 · #00b4d8 · #90e0ef · #caf0f8
@@ -12,8 +12,9 @@
  * count-up statistics.
  */
 import dynamic from 'next/dynamic';
-
 import { useEffect, useMemo, useRef, useState } from 'react';
+
+const EarthGlobe = dynamic(() => import('./EarthGlobe'), { ssr: false });
 import {
   AnimatePresence,
   animate,
@@ -29,41 +30,42 @@ import {
 import {
   ArrowDown,
   ArrowRight,
+  BookOpen,
+  Check,
   ChevronDown,
   Compass,
+  Copy,
   Crosshair,
+  Database,
+  FileCode,
   Globe,
+  Layers,
   Map,
   MapPin,
   MapPinPlus,
   MousePointerClick,
-  Network,
   Repeat,
   ShieldCheck,
-  Workflow,
+  Sparkles,
+  Table,
   type LucideIcon,
 } from 'lucide-react';
 
-import { MermaidDiagram } from '@/components/docs/MermaidDiagram';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CLASS_DIAGRAM, SEQUENCE_DIAGRAM } from '@/lib/docs/diagrams';
 import { cn } from '@/lib/utils';
 
 export interface LandingPageProps {
   onLaunch: () => void;
 }
 
-/** Client-only 3D globe (three.js needs a real browser DOM). */
-const EarthGlobe = dynamic(() => import('./EarthGlobe'), { ssr: false });
-
 const CONTAINER = 'mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8';
 
 const NAV_LINKS = [
   { id: 'fitur', label: 'Fitur' },
   { id: 'cara-kerja', label: 'Cara Kerja' },
-  { id: 'dokumentasi', label: 'Dokumentasi' },
+  { id: 'referensi', label: 'Referensi Data' },
 ] as const;
 
 interface Feature {
@@ -101,13 +103,13 @@ const FEATURES: Feature[] = [
     icon: ShieldCheck,
     title: 'Validasi Ketat',
     description:
-      'Latitude dibatasi ±90°, longitude ±180°, menit dan detik 0–59 — input tidak valid langsung ditolak dengan pesan yang jelas.',
+      'Latitude dibatasi ±90°, longitude ±180°, menit dan detik 0–59. Input tidak valid langsung ditolak dengan pesan yang jelas.',
   },
   {
     icon: MousePointerClick,
     title: 'Panel Konversi Mengambang',
     description:
-      'Panel konversi melayang di atas peta dan bisa dibuka kapan saja — hasilnya langsung siap ditandai ke peta.',
+      'Panel konversi melayang di atas peta dan bisa dibuka kapan saja. Hasilnya langsung siap ditandai ke peta.',
   },
 ];
 
@@ -121,12 +123,98 @@ const STEPS = [
     number: '02',
     title: 'Masukkan koordinat',
     description:
-      'Isi derajat, menit, detik, dan arah — atau mulai dari DD — lalu konversi seketika dengan validasi ketat.',
+      'Isi derajat, menit, detik, dan arah (atau mulai dari DD), lalu konversi seketika dengan validasi ketat.',
   },
   {
     number: '03',
     title: 'Tambahkan ke peta',
     description: 'Tekan Add To Maps: marker langsung muncul dan kamera peta terbang ke titik tersebut.',
+  },
+] as const;
+
+/** Format Standard Specifications */
+const FORMAT_STANDARDS = [
+  {
+    code: 'DMS',
+    name: 'Derajat, Menit, Detik',
+    formula: 'DD = Deg + (Min / 60) + (Sec / 3600)',
+    example: `49° 30' 10.0" N`,
+    range: 'Lat: ±90°, Lon: ±180°',
+    description: 'Format geodesi tradisional yang presisi untuk navigasi maritim, penerbangan, dan pemetaan wilayah.',
+  },
+  {
+    code: 'DD',
+    name: 'Decimal Degrees',
+    formula: 'DD = Arah × (Deg + Min/60 + Sec/3600)',
+    example: '49.50278°',
+    range: '-90.00000° s/d +90.00000°',
+    description: 'Format numerik standar GIS modern (OpenStreetMap, Leaflet, OpenLayers) untuk komputasi spasial.',
+  },
+  {
+    code: 'DDM',
+    name: 'Degrees Decimal Minutes',
+    formula: 'DD = Deg + (Min.Dec / 60)',
+    example: `49° 30.166' N`,
+    range: 'Navigasi Maritim & GPS',
+    description: 'Format standar alat GPS genggam, aviasi sipil, serta pelayaran kapal laut profesional.',
+  },
+  {
+    code: 'UTM',
+    name: 'Universal Transverse Mercator',
+    formula: 'Proyeksi Grid Zone 1–60 (Utara/Selatan)',
+    example: '48N 535800mE 5483200mN',
+    range: 'Grid Spasial Cartesian',
+    description: 'Sistem koordinat proyeksi berbasis satuan meter yang digunakan untuk survei bidang topografi.',
+  },
+] as const;
+
+/** Precision matrix table */
+const PRECISION_LEVELS = [
+  { decimal: '1.0°', resolution: '±111.32 km', scale: 'Provinsi / Negara', detail: 'Cakupan wilayah besar' },
+  { decimal: '0.1°', resolution: '±11.13 km', scale: 'Kota / Kabupaten', detail: 'Batas administrasi daerah' },
+  { decimal: '0.01°', resolution: '±1.11 km', scale: 'Kecamatan / Desa', detail: 'Kawasan pemukiman' },
+  { decimal: '0.001°', resolution: '±111.32 m', scale: 'Kompleks / Lapangan', detail: 'Fasilitas umum & perkebunan' },
+  { decimal: '0.0001°', resolution: '±11.13 m', scale: 'Bangunan / Kavling', detail: 'Posisi fisik gedung & properti' },
+  { decimal: '0.00001°', resolution: '±1.11 m', scale: 'Presisi Default CoordPoint', detail: 'Standar emas peta digital' },
+  { decimal: '0.000001°', resolution: '±11.13 cm', scale: 'Survei & Kadastral BPN', detail: 'Pengukuran batas tanah' },
+] as const;
+
+/** Preset Geographical Landmark Dataset */
+const LANDMARK_DATASETS = [
+  {
+    name: 'Monumen Nasional (Monas)',
+    location: 'DKI Jakarta, Indonesia',
+    dms: `6°10'31.4" S, 106°49'37.6" E`,
+    dd: `-6.17539, 106.82711`,
+    category: 'Ikon Nasional',
+  },
+  {
+    name: 'Titik Nol IKN Nusantara',
+    location: 'Penajam Paser Utara, Kaltim',
+    dms: `0°58'19.2" S, 116°42'32.4" E`,
+    dd: `-0.97200, 116.70900`,
+    category: 'Pusat Pemerintahan',
+  },
+  {
+    name: 'Puncak Gunung Semeru',
+    location: 'Jawa Timur, Indonesia',
+    dms: `8°06'28.8" S, 112°55'12.0" E`,
+    dd: `-8.10800, 112.92000`,
+    category: 'Geografis Alam',
+  },
+  {
+    name: 'Royal Observatory Greenwich',
+    location: 'London, United Kingdom',
+    dms: `51°28'40.1" N, 0°00'05.3" W`,
+    dd: `51.47781, -0.00147`,
+    category: 'Meridian Utama (0°)',
+  },
+  {
+    name: 'Candi Borobudur',
+    location: 'Magelang, Jawa Tengah',
+    dms: `7°36'28.4" S, 110°12'13.7" E`,
+    dd: `-7.60789, 110.20381`,
+    category: 'Warisan UNESCO',
   },
 ] as const;
 
@@ -345,7 +433,7 @@ function HeroVisual({ className }: { className?: string }) {
         <motion.div
           animate={shouldReduceMotion ? undefined : { y: [0, -7, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-44 rounded-2xl border border-[#90e0ef]/20 bg-[#001233]/85 p-3.5 shadow-[0_16px_50px_-12px_rgba(0,180,216,0.5)] backdrop-blur sm:w-48"
+          className="w-44 rounded-2xl border border-[#90e0ef]/20 bg-[#001233]/85 p-3.5 shadow-[0_16px_50px_-12px_rgba(0,180,216,0.5)] backdrop-blur transform-gpu sm:w-48"
         >
           <p className="flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#90e0ef]">
             <span className="relative flex size-1.5" aria-hidden="true">
@@ -414,34 +502,47 @@ function HeroVisual({ className }: { className?: string }) {
   );
 }
 
-interface DocCardProps {
-  icon: LucideIcon;
-  title: string;
-  subtitle: string;
-  diagramId: string;
-  chart: string;
-}
+/** Interactive Landmark Card with Copy feature */
+function LandmarkCard({ item }: { item: (typeof LANDMARK_DATASETS)[number] }) {
+  const [copied, setCopied] = useState(false);
 
-function DocCard({ icon: Icon, title, subtitle, diagramId, chart }: DocCardProps) {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`${item.name} (${item.dd})`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <Card className="h-full gap-0 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-[#0077b6] ring-1 ring-sky-100">
-            <Icon className="size-5" aria-hidden="true" />
+    <Card className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#90e0ef] hover:shadow-md">
+      <div>
+        <div className="flex items-center justify-between gap-2">
+          <span className="rounded-full bg-sky-50 px-3 py-1 font-mono text-[11px] font-semibold text-[#0077b6] ring-1 ring-sky-100">
+            {item.category}
           </span>
-          <div>
-            <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-            <p className="text-xs text-slate-500">{subtitle}</p>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCopy}
+            className="h-8 gap-1.5 rounded-full px-2.5 text-xs text-slate-500 hover:text-slate-900"
+          >
+            {copied ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+            <span>{copied ? 'Tersalin' : 'Salin'}</span>
+          </Button>
         </div>
-        <span className="hidden rounded-full border border-slate-200 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-slate-400 sm:inline-block">
-          mermaid
-        </span>
+        <h4 className="mt-4 text-base font-semibold text-slate-900">{item.name}</h4>
+        <p className="mt-1 text-xs text-slate-500">{item.location}</p>
       </div>
-      <Separator className="my-5" />
-      <div className="max-h-[32rem] overflow-auto rounded-2xl border border-slate-100">
-        <MermaidDiagram id={diagramId} chart={chart} className="p-4" />
+
+      <div className="mt-5 space-y-2 rounded-2xl bg-slate-50 p-3.5 font-mono text-xs">
+        <div className="flex justify-between gap-2 text-slate-600">
+          <span className="text-slate-400">DMS:</span>
+          <span className="font-semibold text-slate-800">{item.dms}</span>
+        </div>
+        <Separator className="bg-slate-200/60" />
+        <div className="flex justify-between gap-2 text-slate-600">
+          <span className="text-slate-400">DD:</span>
+          <span className="font-semibold text-[#0077b6]">{item.dd}</span>
+        </div>
       </div>
     </Card>
   );
@@ -458,14 +559,30 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
   const blobsX = useTransform(springX, (v) => v * -36);
   const blobsY = useTransform(springY, (v) => v * -24);
 
+  const rafRef = useRef<number | null>(null);
+
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     if (shouldReduceMotion) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    mouseX.set((event.clientX - rect.left) / rect.width - 0.5);
-    mouseY.set((event.clientY - rect.top) / rect.height - 0.5);
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+    const currentTarget = event.currentTarget;
+
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      const width = currentTarget.clientWidth || window.innerWidth;
+      const height = currentTarget.clientHeight || window.innerHeight;
+      mouseX.set(clientX / width - 0.5);
+      mouseY.set(clientY / height - 0.5);
+    });
   };
 
   const handleMouseLeave = () => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -473,7 +590,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
       {/* -- Navbar ------------------------------------------------------- */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#03045e]/75 backdrop-blur-md">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#03045e]/75 backdrop-blur-md transform-gpu will-change-transform">
         <div className={cn(CONTAINER, 'flex h-14 items-center justify-between gap-4')}>
           <div className="flex items-center gap-2.5">
             <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#00b4d8] to-[#0077b6] shadow-lg shadow-[#00b4d8]/30">
@@ -510,7 +627,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
         <section
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="relative isolate overflow-hidden bg-[#03045e] text-white"
+          className="relative isolate flex min-h-screen flex-col justify-between overflow-hidden bg-[#03045e] text-white"
         >
           {/* Base gradient wash */}
           <div
@@ -526,18 +643,18 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
           <Particles />
           <GridFloor />
 
-          {/* 3D Earth backdrop — besar, di belakang headline */}
+          {/* 3D Earth backdrop */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
+            className="pointer-events-none absolute top-1/2 z-0 -translate-y-1/2 left-1/2 sm:left-[58%] lg:left-[68%] xl:left-[72%] -translate-x-1/2 transform-gpu"
           >
-            <EarthGlobe className="aspect-square w-[min(72rem,150vw)]" />
+            <EarthGlobe className="aspect-square w-[min(54rem,115vw)] lg:w-[min(62rem,130vw)]" />
           </div>
 
           <div
             className={cn(
               CONTAINER,
-              'relative z-10 flex min-h-[88vh] items-center pb-16 pt-24 sm:pb-20 sm:pt-28',
+              'relative z-10 flex min-h-screen flex-1 items-center pb-16 pt-24 sm:pb-20 sm:pt-28',
             )}
           >
             <motion.div
@@ -576,14 +693,14 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
 
               <motion.p variants={fadeUp} className="mt-6 text-base leading-relaxed text-[#caf0f8]/75 sm:text-lg">
                 Ubah koordinat Derajat-Menit-Detik menjadi Decimal Degrees langsung di atas peta
-                OpenStreetMap — dengan marker interaktif, animasi halus, dan validasi ketat.
+                OpenStreetMap dengan marker interaktif, animasi halus, dan validasi ketat.
               </motion.p>
 
               <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Button
                   type="button"
                   onClick={onLaunch}
-                  className="group relative h-12 gap-4 overflow-hidden rounded-full bg-gradient-to-r from-[#00b4d8] to-[#0077b6] px-10 text-base font-semibold text-white shadow-lg shadow-[#00b4d8]/30 transition-all hover:shadow-xl hover:shadow-[#00b4d8]/40"
+                  className="group relative inline-flex h-12 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-r from-[#00b4d8] to-[#0077b6] px-20 text-center text-base font-semibold text-white shadow-lg shadow-[#00b4d8]/30 transition-all hover:shadow-xl hover:shadow-[#00b4d8]/40 sm:px-24"
                 >
                   <span
                     aria-hidden="true"
@@ -598,10 +715,10 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => scrollToSection('dokumentasi')}
+                  onClick={() => scrollToSection('referensi')}
                   className="h-12 rounded-full border-[#90e0ef]/30 bg-white/5 px-7 text-base text-[#caf0f8] backdrop-blur transition-colors hover:border-[#90e0ef]/60 hover:bg-white/10 hover:text-white"
                 >
-                  Lihat Diagram Rancangan
+                  Lihat Referensi Data
                 </Button>
               </motion.div>
 
@@ -620,7 +737,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
 
           </div>
 
-          {/* Kartu pendukung — boleh menimpa globe */}
+          {/* Kartu pendukung */}
           <HeroVisual className="pointer-events-none absolute inset-0 z-10" />
 
           {/* Scroll cue */}
@@ -643,7 +760,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                   titleId="fitur-title"
                   label="Fitur"
                   title="Semua yang dibutuhkan untuk bekerja dengan koordinat"
-                  description="Dari konversi dua arah hingga visualisasi di peta — dirancang presisi, cepat, dan mudah diverifikasi."
+                  description="Dari konversi dua arah hingga visualisasi di peta: dirancang presisi, cepat, dan mudah diverifikasi."
                 />
               </motion.div>
 
@@ -680,7 +797,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                   titleId="cara-kerja-title"
                   label="Cara Kerja"
                   title="Tiga langkah dari koordinat ke peta"
-                  description="Alur penggunaan yang ringkas — tanpa perhitungan manual, tanpa copy-paste ke tools lain."
+                  description="Alur penggunaan yang ringkas tanpa perhitungan manual dan tanpa copy-paste ke tools lain."
                 />
               </motion.div>
 
@@ -710,37 +827,126 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
           </div>
         </section>
 
-        {/* -- Documentation ---------------------------------------------- */}
-        <section id="dokumentasi" aria-labelledby="dokumentasi-title" className="scroll-mt-24 py-14 sm:py-20">
+        {/* -- Geodesic Specifications & Reference Data Section --------------- */}
+        <section id="referensi" aria-labelledby="referensi-title" className="scroll-mt-24 py-14 sm:py-20">
           <div className={CONTAINER}>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={staggerContainer}>
               <motion.div variants={fadeUp}>
                 <SectionHeading
-                  titleId="dokumentasi-title"
-                  label="Dokumentasi"
-                  title="Diagram rancangan sistem"
-                  description="Perancangan lengkap dalam bentuk class diagram & sequence diagram — juga tersedia di folder docs/."
+                  titleId="referensi-title"
+                  label="Spesifikasi & Data"
+                  title="Standard Format & Matriks Presisi Geodesi"
+                  description="Panduan komprehensif sistem koordinat WGS84, tingkat akurasi desimal, dan referensi data geografis."
                 />
               </motion.div>
 
-              <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <motion.div variants={fadeUp} className="min-w-0">
-                  <DocCard
-                    icon={Network}
-                    title="Class Diagram"
-                    subtitle="Struktur modul, converter, dan komponen UI"
-                    diagramId="class-diagram"
-                    chart={CLASS_DIAGRAM}
-                  />
+              {/* Grid 1: Format Standards */}
+              <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {FORMAT_STANDARDS.map((fmt) => (
+                  <motion.div key={fmt.code} variants={fadeUp} className="min-w-0">
+                    <Card className="flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#90e0ef] hover:shadow-md">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="rounded-xl bg-gradient-to-br from-[#00b4d8] to-[#0077b6] px-3 py-1 font-mono text-xs font-bold text-white shadow-sm">
+                            {fmt.code}
+                          </span>
+                          <span className="font-mono text-[10px] uppercase text-slate-400">Standard</span>
+                        </div>
+                        <h3 className="mt-4 text-base font-semibold text-slate-900">{fmt.name}</h3>
+                        <p className="mt-2 text-xs leading-relaxed text-slate-600">{fmt.description}</p>
+                      </div>
+
+                      <div className="mt-5 space-y-2 rounded-2xl bg-slate-50 p-3 font-mono text-[11px]">
+                        <div>
+                          <span className="block text-[10px] text-slate-400 uppercase">Rumus:</span>
+                          <span className="font-medium text-slate-700">{fmt.formula}</span>
+                        </div>
+                        <Separator className="bg-slate-200/60" />
+                        <div>
+                          <span className="block text-[10px] text-slate-400 uppercase">Contoh:</span>
+                          <span className="font-bold text-[#0077b6]">{fmt.example}</span>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Grid 2: Precision Matrix & Landmark Benchmarks (Side-by-Side Equal Height) */}
+              <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12 items-stretch">
+                {/* Left Column: Matriks Presisi Desimal (DD) */}
+                <motion.div variants={fadeUp} className="flex flex-col lg:col-span-7">
+                  <Card className="flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-[#0077b6] ring-1 ring-sky-100">
+                          <Table className="size-5" aria-hidden="true" />
+                        </span>
+                        <div>
+                          <h3 className="text-base font-semibold text-slate-900">Matriks Presisi Desimal (DD)</h3>
+                          <p className="text-xs text-slate-500">Resolusi fisik jarak terhadap jumlah tempat desimal</p>
+                        </div>
+                      </div>
+                      <Separator className="my-5" />
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-slate-100 font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                              <th className="pb-3 pr-2">Desimal</th>
+                              <th className="pb-3 px-2">Resolusi Jarak</th>
+                              <th className="pb-3 px-2">Skala Wilayah</th>
+                              <th className="pb-3 pl-2">Detail Penggunaan</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-medium">
+                            {PRECISION_LEVELS.map((row) => (
+                              <tr
+                                key={row.decimal}
+                                className={cn(
+                                  'transition-colors hover:bg-slate-50/80',
+                                  row.decimal === '0.00001°' && 'bg-sky-50/50 font-semibold text-[#0077b6]',
+                                )}
+                              >
+                                <td className="py-3 pr-2 font-mono">{row.decimal}</td>
+                                <td className="py-3 px-2 font-mono text-slate-700">{row.resolution}</td>
+                                <td className="py-3 px-2 text-slate-900">{row.scale}</td>
+                                <td className="py-3 pl-2 text-slate-500">{row.detail}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 flex items-start gap-3 rounded-2xl border border-sky-100 bg-sky-50/60 p-4 text-xs text-[#0077b6]">
+                      <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#0077b6]" aria-hidden="true" />
+                      <div>
+                        <span className="font-semibold text-[#03045e]">Standar Presisi Geodesi WGS84:</span>{' '}
+                        Format pembulatan 5 desimal (0.00001° / resolusi ±1.11m) untuk navigasi presisi tinggi.
+                      </div>
+                    </div>
+                  </Card>
                 </motion.div>
-                <motion.div variants={fadeUp} className="min-w-0">
-                  <DocCard
-                    icon={Workflow}
-                    title="Sequence Diagram"
-                    subtitle="Alur interaksi konversi hingga marker muncul"
-                    diagramId="sequence-diagram"
-                    chart={SEQUENCE_DIAGRAM}
-                  />
+
+                {/* Right Column: Benchmark Data Geografis */}
+                <motion.div variants={fadeUp} className="flex flex-col lg:col-span-5">
+                  <div className="flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-slate-50/50 p-6 shadow-sm">
+                    <div>
+                      <div className="flex items-center gap-2.5">
+                        <Sparkles className="size-4 text-[#00b4d8]" />
+                        <h3 className="text-base font-semibold text-slate-900">Benchmark Data Geografis</h3>
+                      </div>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Kumpulan contoh koordinat lokasi populer yang dapat disalin secara instan.
+                      </p>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-1 gap-4">
+                      {LANDMARK_DATASETS.slice(0, 2).map((item) => (
+                        <LandmarkCard key={item.name} item={item} />
+                      ))}
+                    </div>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>
@@ -774,7 +980,7 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 Siap mencoba konversi koordinat?
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#caf0f8]/70">
-                Coba sendiri bagaimana DMS berubah menjadi DD — lalu lihat titiknya muncul di peta dalam hitungan
+                Coba sendiri bagaimana DMS berubah menjadi DD, lalu lihat titiknya muncul di peta dalam hitungan
                 detik.
               </p>
               <div className="mt-8 flex justify-center">
@@ -811,12 +1017,8 @@ export default function LandingPage({ onLaunch }: LandingPageProps) {
                 <span className="text-base font-semibold tracking-tight text-slate-900">CoordPoint</span>
               </div>
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-500">
-                Ubah koordinat Derajat-Menit-Detik menjadi Decimal Degrees — dan sebaliknya —
+                Ubah koordinat Derajat-Menit-Detik menjadi Decimal Degrees dan sebaliknya
                 langsung di atas peta OpenStreetMap.
-              </p>
-              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 font-mono text-[11px] text-slate-500">
-                <span aria-hidden="true" className="size-2 rounded-full bg-[#00b4d8]" />
-                Pusat peta default: 6.20000° S, 106.82778° E · Zoom 10
               </p>
             </div>
 

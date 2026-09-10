@@ -1,3 +1,7 @@
+/**
+ * @module dd-to-dms
+ * @description Provides mathematical conversion from Decimal Degrees (DD) to Degrees-Minutes-Seconds (DMS) notation.
+ */
 import type { Axis, CardinalDirection, DmsCoordinate } from './types'
 import { assertValidDd, assertValidDms } from './validate'
 

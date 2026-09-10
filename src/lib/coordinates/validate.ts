@@ -1,3 +1,7 @@
+/**
+ * @module validate
+ * @description Provides validation logic and assertions for DMS and DD coordinates against WGS84 standards.
+ */
 import type { Axis, CardinalDirection, DmsCoordinate } from './types'
 import { CoordinateValidationError, LATITUDE_MAX_DEGREES, LONGITUDE_MAX_DEGREES } from './types'
 

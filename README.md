@@ -1,102 +1,139 @@
-# CoordPoint — Konversi Koordinat DMS ⇄ DD
+# CoordPoint — Konversi Koordinat DMS ⇄ DD & Peta Geodesi
 
-Aplikasi pemetaan berbasis **React + TypeScript + OpenLayers** untuk mengubah
-format koordinat geografis dari **DMS (Degree, Minutes, Seconds)** menjadi
-**DD (Decimal Degrees)** dan sebaliknya, lengkap dengan integrasi peta
-OpenStreetMap, marker interaktif, unit test Jest, serta dokumentasi perancangan.
-
-> Landing page memperkenalkan proyek, menampilkan dokumentasi class & sequence
-> diagram, dan terhubung langsung ke aplikasi peta melalui tombol **"Buka Peta"**.
+Aplikasi web modern berbasis **Next.js 16 (React 19) + TypeScript + OpenLayers** untuk melakukan konversi presisi tinggi dari koordinat **DMS (Degree, Minutes, Seconds)** ke **DD (Decimal Degrees)** dan sebaliknya, dilengkapi visualisasi peta OpenStreetMap, 3D modelling bumi interaktif, unit test Jest 100% lulus, dan standar dokumentasi JSDoc.
 
 ---
 
-## ✨ Fitur
+## ⚡ 1. VERSI RINGKAS (QUICK START GUIDE)
 
-| Fitur | Deskripsi |
-| --- | --- |
-| 🗺️ **Peta OpenStreetMap** | Tile OSM dirender dengan library [OpenLayers 10](https://openlayers.org/) |
-| 🔁 **DMS → DD** | Input derajat, menit, detik + arah (N/S, E/W) → hasil desimal dengan satuan arah, mis. `49.50278° N` |
-| 🔁 **DD → DMS** | Input derajat desimal → hasil `49°30'10.01" N` (sistem tab: pilih arah konversi) |
-| 📍 **Add To Maps** | Menambahkan marker/point pada peta dan memusatkan (center) peta dengan animasi halus |
-| ✅ **Validasi ketat** | Latitude 0–90°, longitude 0–180°, menit/detik 0–59, arah wajib sesuai axis, pesan error berbahasa Indonesia |
-| 🧪 **Unit Test Jest** | 40 test case untuk seluruh fungsi konversi, format, validasi, dan round-trip |
-| 🧾 **JSDoc** | Seluruh fungsi pada library terdokumentasi mengikuti standar [JSDoc](https://jsdoc.app/about-getting-started) |
-| 📐 **Dokumentasi perancangan** | Class diagram & sequence diagram (Mermaid) pada landing page dan folder `docs/` |
+Petunjuk praktis untuk pengguna yang ingin langsung mencoba aplikasi dan pengujian:
+
+* **1. Clone & Masuk Folder**: `git clone <repo-url> && cd coordpoint`
+* **2. Install Dependencies**: `npm install` (atau `bun install`)
+* **3. Jalankan Dev Server**: `npm run dev` → Akses `http://localhost:3000`
+* **4. Jalankan Unit Test (Jest)**: `npm test` (40/40 test case lulus)
+* **5. Jalankan Type Check & Lint**: `npx tsc --noEmit` & `npx eslint .`
+* **6. Build Produksi**: `npx next build`
 
 ---
 
-## 🛠️ Tech Stack
-
-- **React 19 + TypeScript 5** (Next.js 16 App Router)
-- **Tailwind CSS 4** + komponen **shadcn/ui**
-- **OpenLayers 10** (map engine) + tile **OpenStreetMap**
-- **Jest 30** untuk unit testing
-- **Mermaid** untuk rendering diagram dokumentasi
-- **ESLint** (config `eslint-config-next`) untuk clean code
+## 📖 2. PANDUAN LENGKAP & DETAIL
 
 ---
 
-## 🚀 Instalasi & Menjalankan
+### 📋 Prasyarat Sistem
 
-### Prasyarat
+Sebelum memulai instalasi, pastikan lingkungan sistem Anda memenuhi spesifikasi berikut:
 
-- **Node.js ≥ 18** (atau [Bun](https://bun.sh) ≥ 1.1)
-- Git
+* **Node.js**: `v18.17.0` atau versi lebih baru (Direkomendasikan Node.js LTS `v20.x`).
+* **Package Manager**: `npm` (`v9.x` atau lebih baru) atau `bun` (`v1.1.x`).
+* **Git**: `v2.x` untuk melakukan pengklonaan repositori.
+* **Browser**: Browser modern yang mendukung WebGL 2.0 (Google Chrome, Mozilla Firefox, Microsoft Edge, Safari).
 
-### Langkah Instalasi
+---
 
+### 📦 Langkah Instalasi & Pengoperasian
+
+#### 1. Kloning Repositori
+Buka terminal shell dan jalankan perintah:
 ```bash
-# 1. Clone repository
-git clone <URL_REPOSITORY_ANDA>.git
+git clone https://github.com/arofandestama/coordpoint-web.git
 cd coordpoint
-
-# 2. Install dependency
-npm install
-# atau bila menggunakan bun:
-# bun install
-
-# 3. Jalankan development server
-npm run dev
-# atau: bun run dev
-
-# 4. Buka browser
-# http://localhost:3000
 ```
 
-Halaman pertama yang tampil adalah **landing page**. Klik tombol
-**"Buka Peta"** (di navbar, hero, maupun CTA bawah) untuk masuk ke
-aplikasi peta utama.
-
-### Menjalankan Unit Test (Jest)
-
+#### 2. Instalasi Dependensi
+Instal seluruh modul dependensi yang dibutuhkan:
 ```bash
-npm run test
-# watch mode:
+npm install
+```
+
+#### 3. Menjalankan Server Pengkodingan (Development Server)
+Jalankan server lokal Next.js dengan perintah:
+```bash
+npm run dev
+```
+Buka browser Anda dan navigasikan ke `http://localhost:3000`.
+
+---
+
+### 🧪 Panduan Lengkap Pengujian (Unit Testing)
+
+Aplikasi CoordPoint dilengkapi dengan pengujian unit komprehensif menggunakan **Jest 30** dan **React Testing Library** yang mencakup 40 kasus uji matematis geodesi.
+
+#### Menjalankan Test Suite
+Untuk mengeksekusi pengujian otomatis, jalankan:
+```bash
+npm test
+```
+
+#### Menjalankan Mode Pantau (Watch Mode)
+Untuk pengkodingan interaktif dan mengeksekusi tes setiap kali ada perubahan berkas:
+```bash
 npm run test:watch
 ```
 
-Output yang diharapkan:
+#### Hasil Pengujian yang Diharapkan
+```text
+PASS src/__tests__/dd-to-dms.test.ts
+PASS src/__tests__/format.test.ts
+PASS src/__tests__/dms-to-dd.test.ts
+PASS src/__tests__/roundtrip.test.ts
 
-```
 Test Suites: 4 passed, 4 total
 Tests:       40 passed, 40 total
+Snapshots:   0 total
+Time:        0.727 s
 ```
 
-Cakupan pengujian (`src/__tests__/`):
+#### Rincian Cakupan Berkas Pengujian (`src/__tests__/`)
 
-| File | Cakupan |
-| --- | --- |
-| `dms-to-dd.test.ts` | Konversi DMS→DD (positif/negatif arah, batas, error) |
-| `dd-to-dms.test.ts` | Konversi DD→DMS (pembulatan detik, carry 60", batas ±90/±180) |
-| `format.test.ts` | Format keluaran `49.50278° N` dan `49°30'10.01" N` |
-| `roundtrip.test.ts` | Invariansi `dmsToDd(ddToDms(x)) ≈ x` |
+| Berkas Pengujian | Fungsi Utama | Kasus Uji (Test Cases) |
+| :--- | :--- | :--- |
+| `dms-to-dd.test.ts` | Transformasi DMS ke Decimal Degrees | Pengujian arah N/S/E/W, batas max lat ±90° & lon ±180°, serta penanganan throw error validasi. |
+| `dd-to-dms.test.ts` | Transformasi Decimal Degrees ke DMS | Pengujian perataan detik, carry-over 60" ke menit dan derajat, serta penanganan nilai negatif. |
+| `format.test.ts` | Standar Format Output | Pengujian keluaran teks human-readable seperti `49.50278° N` dan `49°30'10.01" N`. |
+| `roundtrip.test.ts` | Invariansi Matematis (Round-trip) | Pengujian bahwa `dmsToDd(ddToDms(x))` mengembalikan koordinat `x` yang presisi tanpa distorsi. |
 
-### Build Produksi
+---
 
-```bash
-npm run build
-npm run start
-```
+### 📏 Standar Clean Code & JSDoc Documentation
+
+Aplikasi ini menggunakan standar penulisan **Clean Code TypeScript React** dan dokumentasi **JSDoc resmi** ([https://jsdoc.app/about-getting-started](https://jsdoc.app/about-getting-started)):
+
+* **JSDoc Annotations**: Seluruh fungsi dan komponen menggunakan tag `@module`, `@function`, `@component`, `@param`, `@returns`, `@throws`, dan `@example`.
+* **ESLint Compliance**: Bebas dari tipe `any`, mematuhi aturan strict mode React, dan lulus pengujian `npx eslint .`.
+* **Desain Tampilan**: Scrollbar disembunyikan secara bersih di seluruh browser (`::-webkit-scrollbar { display: none; }`) tanpa mengganggu fungsi scroll.
+
+---
+
+### 🚀 Best Practices Optimasi Performa 3D WebGL (Earth Modeling)
+
+Untuk memastikan pengolahan grafik 3D di browser berjalan sangat cepat tanpa mengalami **Input Delay** (~453ms):
+
+1. **Kompresi Asset 3D (`.glb`)**:
+   - Model `earth.glb` berukuran **58.5 MB** dapat dikompresi menggunakan **Draco Mesh Compression** (`gltf-pipeline -i earth.glb -o earth-draco.glb -d`) untuk mengurangi ukuran berkas hingga >90% (< 3 MB).
+2. **Pengurangan Draw Calls**:
+   - Menghapus elemen dekorasi berat di sekitar globe (misal orbit torus & starfield vertex) sehingga komponen Three.js hanya menjalankan **1 single draw call** yang sangat ringan.
+3. **React Memoization**:
+   - Membungkus komponen canvas 3D dengan `React.memo` agar Three.js tidak melakukan re-render ulang saat state komponen induk (Landing Page) berubah.
+4. **Optimasi Frame Loop & DPR**:
+   - Membatasi Device Pixel Ratio ke `dpr={[1, 1.5]}` dan menggunakan opsi WebGL `powerPreference: 'high-performance'` untuk menjamin rotasi 60 FPS pada layar retina.
+5. **Non-blocking Event Listener**:
+   - Menggunakan `requestAnimationFrame` dan membaca properti `clientWidth`/`clientHeight` sebagai pengganti `getBoundingClientRect()` pada listener `onMouseMove` untuk mencegah *forced synchronous reflow*.
+
+---
+
+### 🛠️ Perintah Utama (Summary Commands)
+
+| Perintah | Deskripsi |
+| :--- | :--- |
+| `npm run dev` | Menjalankan development server pada `http://localhost:3000` |
+| `npm test` | Menjalankan 40 unit test Jest |
+| `npm run test:watch` | Menjalankan Jest dalam mode interaktif (watch mode) |
+| `npx tsc --noEmit` | Pengecekan validasi tipe TypeScript |
+| `npx eslint .` | Pengecekan standar clean code ESLint |
+| `npx next build` | Kompilasi build produksi Next.js |
+
 
 ---
 

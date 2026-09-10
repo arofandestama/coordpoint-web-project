@@ -1,11 +1,11 @@
 'use client';
 
 /**
- * MapWorkspace — application view hosting the OpenLayers map.
+ * @module MapWorkspace
+ * @description Application workspace hosting the interactive OpenLayers map canvas, header readouts, and conversion panel overlay.
  *
- * Layout: sticky app header (back navigation, brand, live map-center readout)
- * above a full-height map with a floating action button that opens the
- * {@link ConversionPanel}.
+ * @see {@link MapService}
+ * @see {@link ConversionPanel}
  */
 import { useCallback, useRef, useState } from 'react';
 import { ArrowLeft, Crosshair, Info, MapPin } from 'lucide-react';
