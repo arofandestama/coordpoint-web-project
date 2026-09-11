@@ -142,8 +142,11 @@ Untuk memastikan pengolahan grafik 3D di browser berjalan sangat cepat tanpa men
 ```
 coordpoint/
 ├── docs/
-│   ├── class-diagram.md          # Class diagram (Mermaid) + penjelasan relasi
-│   └── sequence-diagram.md       # Sequence diagram (Mermaid) alur aplikasi
+│   ├── images/
+│   │   ├── class-diagram.png     # Gambar Class Diagram
+│   │   └── sequence-diagram.png  # Gambar Sequence Diagram
+│   ├── class-diagram.md          # Dokumentasi Class Diagram
+│   └── sequence-diagram.md       # Dokumentasi Sequence Diagram
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx            # Root layout (font, metadata, Toaster)
@@ -192,42 +195,13 @@ sudah ada dengan **class diagram** dan **sequence diagram**:
 
 Keduanya juga dirender interaktif pada landing page, bagian **Dokumentasi**.
 
-### Class Diagram (ringkas)
+### Class Diagram
 
-```mermaid
-classDiagram
-    direction LR
-    class CoordinateValidator {
-        <<module>>
-        +assertValidDms(dms, axis) void
-        +assertValidDd(dd, axis) void
-    }
-    class DmsToDdConverter {
-        <<module>>
-        +dmsToDd(dms, axis) number
-        +formatDd(dd, axis, precision) string
-    }
-    class DdToDmsConverter {
-        <<module>>
-        +ddToDms(dd, axis) DmsCoordinate
-        +formatDms(dms, axis) string
-    }
-    class MapService {
-        <<class>>
-        +createMap(target) ol_Map
-        +addMarker(lonLat) void
-        +flyTo(lonLat, zoom) void
-    }
-    class ConversionPanel {
-        <<component>>
-        +onAddToMap(payload) void
-    }
-    DmsToDdConverter --> CoordinateValidator: validates input
-    DdToDmsConverter --> CoordinateValidator: validates input
-    ConversionPanel ..> DmsToDdConverter: DMS to DD tab
-    ConversionPanel ..> DdToDmsConverter: DD to DMS tab
-    ConversionPanel --> MapService: requests via onAddToMap
-```
+![Class Diagram — CoordPoint](docs/images/class-diagram.png)
+
+### Sequence Diagram
+
+![Sequence Diagram — CoordPoint](docs/images/sequence-diagram.png)
 
 ---
 

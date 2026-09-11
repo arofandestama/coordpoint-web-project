@@ -6,77 +6,7 @@ disimpan sebagai sumber mermaid di `src/lib/docs/diagrams.ts`.
 
 ## Diagram
 
-```mermaid
-classDiagram
-    direction LR
-
-    class CoordinateTypes {
-        <<module>>
-        Axis
-        DirectionLatitude
-        DirectionLongitude
-        DmsCoordinate
-    }
-
-    class CoordinateValidator {
-        <<module>>
-        +assertValidDms(dms, axis) void
-        +assertValidDd(dd, axis) void
-        +CoordinateValidationError
-    }
-
-    class DmsToDdConverter {
-        <<module>>
-        +dmsToDd(dms, axis) number
-        +formatDd(dd, axis, precision) string
-    }
-
-    class DdToDmsConverter {
-        <<module>>
-        +ddToDms(dd, axis) DmsCoordinate
-        +formatDms(dms, axis) string
-    }
-
-    class MapService {
-        <<class>>
-        -map
-        -markerSource
-        +createMap(target) ol_Map
-        +addMarker(lonLat) void
-        +flyTo(lonLat, zoom) void
-        +pulseAt(lonLat) void
-        +onCenterChange(cb) void
-        +destroy() void
-    }
-
-    class FloatingButton {
-        <<component>>
-        +onClick() void
-    }
-
-    class ConversionPanel {
-        <<component>>
-        +activeTab
-        +onAddToMap(payload) void
-    }
-
-    class MapWorkspace {
-        <<component>>
-        +service
-        +handleAddToMap(payload) void
-    }
-
-    DmsToDdConverter --> CoordinateTypes: uses
-    DdToDmsConverter --> CoordinateTypes: uses
-    DmsToDdConverter --> CoordinateValidator: validates input
-    DdToDmsConverter --> CoordinateValidator: validates input
-    ConversionPanel ..> DmsToDdConverter: DMS to DD tab
-    ConversionPanel ..> DdToDmsConverter: DD to DMS tab
-    MapWorkspace --> MapService: controls map
-    MapWorkspace --> ConversionPanel: renders
-    MapWorkspace --> FloatingButton: renders
-    ConversionPanel --> MapService: requests via onAddToMap
-```
+![Class Diagram — CoordPoint](images/class-diagram.png)
 
 ## Penjelasan Relasi
 

@@ -6,39 +6,7 @@ marker muncul di peta OpenLayers. Diagram ini juga dirender pada landing page
 
 ## Skenario: Konversi DMS → DD lalu Add To Maps
 
-```mermaid
-sequenceDiagram
-    actor User as Pengguna
-    participant FB as FloatingButton
-    participant CP as ConversionPanel
-    participant V as Validator
-    participant C as Converter
-    participant MS as MapService
-    participant OL as OpenLayers Map
-
-    User->>FB: Klik tombol konversi
-    FB->>CP: Buka panel konversi
-    User->>CP: Isi input DMS (derajat, menit, detik, arah)
-    User->>CP: Klik "Konversi ke DD"
-    CP->>V: assertValidDms(dms, axis)
-    alt Input tidak valid
-        V-->>CP: CoordinateValidationError
-        CP-->>User: Tampilkan pesan error
-    else Input valid
-        V-->>CP: valid
-        CP->>C: dmsToDd(dms, axis)
-        C-->>CP: dd (decimal degrees)
-        CP->>C: formatDd(dd, axis)
-        C-->>CP: "49.50278° N"
-        CP-->>User: Tampilkan hasil DD
-        User->>CP: Klik "Add To Maps"
-        CP->>MS: addMarker(lonLat)
-        MS->>OL: Tambah Feature + Icon marker
-        CP->>MS: flyTo(lonLat)
-        MS->>OL: view.animate(center, zoom)
-        OL-->>User: Peta berpusat di marker baru
-    end
-```
+![Sequence Diagram — CoordPoint](images/sequence-diagram.png)
 
 ## Penjelasan Tahapan
 
