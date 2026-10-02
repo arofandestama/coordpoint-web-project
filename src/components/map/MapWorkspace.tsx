@@ -10,15 +10,17 @@
 import { useCallback, useRef, useState } from 'react';
 import { ArrowLeft, Crosshair, Info, MapPin } from 'lucide-react';
 
+import { Badge } from '@/common/badge';
+import { Button } from '@/common/button';
+import { MapService } from '@/common/mapService';
+import { Separator } from '@/common/separator';
 import { ConversionPanel, type AddToMapPayload } from '@/components/map/ConversionPanel';
 import { FloatingButton } from '@/components/map/FloatingButton';
 import { MapCanvas } from '@/components/map/MapCanvas';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-import { formatDd } from '@/lib/coordinates';
-import { MapService, type LonLat } from '@/lib/ol/map-service';
+import { useToast } from '@/hooks/useToast';
+import { useMapStore } from '@/store/useMapStore';
+import type { LonLat } from '@/types/geo.types';
+import { formatDd } from '@/utils/coordinates';
 
 interface MapWorkspaceProps {
   /** Returns the user to the landing page. */
@@ -33,9 +35,13 @@ interface MapWorkspaceProps {
 export default function MapWorkspace({ onBack }: MapWorkspaceProps) {
   const serviceRef = useRef<MapService | null>(null);
   const [center, setCenter] = useState<LonLat | null>(null);
-  const [panelOpen, setPanelOpen] = useState(false);
-  const [markerCount, setMarkerCount] = useState(0);
   const { toast } = useToast();
+
+  const panelOpen = useMapStore((state) => state.panelOpen);
+  const openPanel = useMapStore((state) => state.openPanel);
+  const closePanel = useMapStore((state) => state.closePanel);
+  const markerCount = useMapStore((state) => state.markers.length);
+  const recordMarker = useMapStore((state) => state.addMarker);
 
   /** Stores the MapService created by the canvas. */
   const handleReady = useCallback((service: MapService) => {
@@ -55,13 +61,13 @@ export default function MapWorkspace({ onBack }: MapWorkspaceProps) {
       service.addMarker(payload.lonLat);
       service.flyTo(payload.lonLat);
       service.pulseAt(payload.lonLat);
-      setMarkerCount((count) => count + 1);
+      recordMarker({ lonLat: payload.lonLat, title: payload.title });
       toast({
         title: 'Marker berhasil ditambahkan',
         description: payload.title,
       });
     },
-    [toast],
+    [recordMarker, toast],
   );
 
   return (
@@ -110,7 +116,7 @@ export default function MapWorkspace({ onBack }: MapWorkspaceProps) {
 
         {!panelOpen && (
           <>
-            <FloatingButton onClick={() => setPanelOpen(true)} />
+            <FloatingButton onClick={openPanel} />
             <div className="pointer-events-none absolute bottom-14 left-4 z-10 hidden items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 text-xs text-slate-500 shadow-sm backdrop-blur sm:flex">
               <Info className="h-3.5 w-3.5 text-[#00b4d8]" aria-hidden="true" />
               Tekan tombol untuk konversi DMS ⇄ DD
@@ -120,7 +126,7 @@ export default function MapWorkspace({ onBack }: MapWorkspaceProps) {
 
         {panelOpen && (
           <ConversionPanel
-            onClose={() => setPanelOpen(false)}
+            onClose={closePanel}
             onAddToMap={handleAddToMap}
           />
         )}

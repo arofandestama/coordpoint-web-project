@@ -8,7 +8,8 @@
  */
 import { useEffect, useRef } from 'react';
 
-import { MapService, type LonLat } from '@/lib/ol/map-service';
+import { MapService } from '@/common/mapService';
+import type { LonLat } from '@/types/geo.types';
 
 interface MapCanvasProps {
   /** Called once, right after the map has been created. */

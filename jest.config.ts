@@ -5,7 +5,7 @@ const createJestConfig = nextJest({ dir: './' })
 
 const config: Config = {
   testEnvironment: 'jsdom',
-  testMatch: ['<rootDir>/src/__tests__/**/*.test.ts?(x)'],
+  testMatch: ['<rootDir>/src/**/*.test.ts?(x)'],
   clearMocks: true,
   modulePathIgnorePatterns: ['<rootDir>/.next/'],
 }

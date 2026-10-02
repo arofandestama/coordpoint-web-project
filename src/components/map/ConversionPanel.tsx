@@ -12,11 +12,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Copy, MapPinPlus, RotateCcw, X } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/common/badge';
+import { Button } from '@/common/button';
+import { Input } from '@/common/input';
+import { Label } from '@/common/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/common/tabs';
 import {
   ddToDms,
   dmsToDd,
@@ -25,9 +25,9 @@ import {
   CoordinateValidationError,
   type CardinalDirection,
   type DmsCoordinate,
-} from '@/lib/coordinates';
-import type { LonLat } from '@/lib/ol/map-service';
-import { cn } from '@/lib/utils';
+} from '@/utils/coordinates';
+import type { LonLat } from '@/types/geo.types';
+import { cn } from '@/utils/cn';
 
 /** Payload delivered to the map when the user presses "Add To Maps". */
 export interface AddToMapPayload {

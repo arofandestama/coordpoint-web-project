@@ -2,7 +2,7 @@
 
 Rencana relasi class/function untuk studi kasus konversi koordinat DMS ⇄ DD.
 Diagram ini juga dirender langsung pada landing page (bagian **Dokumentasi**) dan
-disimpan sebagai sumber mermaid di `src/lib/docs/diagrams.ts`.
+disimpan sebagai sumber mermaid di `src/constants/diagrams.constants.ts`.
 
 ## Diagram
 
@@ -24,11 +24,11 @@ disimpan sebagai sumber mermaid di `src/lib/docs/diagrams.ts`.
 
 | Simbol pada diagram | Lokasi file |
 | --- | --- |
-| `CoordinateTypes` | `src/lib/coordinates/types.ts` |
-| `CoordinateValidator` | `src/lib/coordinates/validate.ts` |
-| `DmsToDdConverter` | `src/lib/coordinates/dms-to-dd.ts` |
-| `DdToDmsConverter` | `src/lib/coordinates/dd-to-dms.ts` |
-| `MapService` | `src/lib/ol/map-service.ts` |
+| `CoordinateTypes` | `src/types/coordinate.types.ts` |
+| `CoordinateValidator` | `src/utils/coordinates/validate.ts` |
+| `DmsToDdConverter` | `src/utils/coordinates/dmsToDd.ts` |
+| `DdToDmsConverter` | `src/utils/coordinates/ddToDms.ts` |
+| `MapService` | `src/common/mapService.ts` |
 | `MapWorkspace` | `src/components/map/MapWorkspace.tsx` |
 | `ConversionPanel` | `src/components/map/ConversionPanel.tsx` |
 | `FloatingButton` | `src/components/map/FloatingButton.tsx` |

@@ -51,10 +51,10 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
+import { Button } from '@/common/button';
+import { Card } from '@/common/card';
+import { Separator } from '@/common/separator';
+import { cn } from '@/utils/cn';
 
 /**
  * Properties for the {@link LandingPage} component.

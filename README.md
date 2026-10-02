@@ -58,7 +58,7 @@ Buka browser Anda dan navigasikan ke `http://localhost:3000`.
 
 ### Panduan Lengkap Pengujian (Unit Testing)
 
-Aplikasi CoordPoint dilengkapi dengan pengujian unit komprehensif menggunakan **Jest 30** dan **React Testing Library** yang mencakup 40 kasus uji matematis geodesi.
+Aplikasi CoordPoint dilengkapi dengan pengujian unit komprehensif menggunakan **Jest 30** + **jsdom** yang mencakup 40 kasus uji matematis geodesi. Setiap berkas uji *colocated* di samping modul yang diuji (mis. `src/utils/coordinates/dmsToDd.test.ts`).
 
 #### Menjalankan Test Suite
 Untuk mengeksekusi pengujian otomatis, jalankan:
@@ -74,10 +74,10 @@ npm run test:watch
 
 #### Hasil Pengujian yang Diharapkan
 ```text
-PASS src/__tests__/dd-to-dms.test.ts
-PASS src/__tests__/format.test.ts
-PASS src/__tests__/dms-to-dd.test.ts
-PASS src/__tests__/roundtrip.test.ts
+PASS src/utils/coordinates/ddToDms.test.ts
+PASS src/utils/coordinates/dmsToDd.test.ts
+PASS src/utils/coordinates/format.test.ts
+PASS src/utils/coordinates/roundtrip.test.ts
 
 Test Suites: 4 passed, 4 total
 Tests:       40 passed, 40 total
@@ -89,8 +89,8 @@ Time:        0.727 s
 
 | Berkas Pengujian | Fungsi Utama | Kasus Uji (Test Cases) |
 | :--- | :--- | :--- |
-| `dms-to-dd.test.ts` | Transformasi DMS ke Decimal Degrees | Pengujian arah N/S/E/W, batas max lat ±90° & lon ±180°, serta penanganan throw error validasi. |
-| `dd-to-dms.test.ts` | Transformasi Decimal Degrees ke DMS | Pengujian perataan detik, carry-over 60" ke menit dan derajat, serta penanganan nilai negatif. |
+| `dmsToDd.test.ts` | Transformasi DMS ke Decimal Degrees | Pengujian arah N/S/E/W, batas max lat ±90° & lon ±180°, serta penanganan throw error validasi. |
+| `ddToDms.test.ts` | Transformasi Decimal Degrees ke DMS | Pengujian perataan detik, carry-over 60" ke menit dan derajat, serta penanganan nilai negatif. |
 | `format.test.ts` | Standar Format Output | Pengujian keluaran teks human-readable seperti `49.50278° N` dan `49°30'10.01" N`. |
 | `roundtrip.test.ts` | Invariansi Matematis (Round-trip) | Pengujian bahwa `dmsToDd(ddToDms(x))` mengembalikan koordinat `x` yang presisi tanpa distorsi. |
 
@@ -148,36 +148,56 @@ coordpoint/
 │   ├── class-diagram.md          # Dokumentasi Class Diagram
 │   └── sequence-diagram.md       # Dokumentasi Sequence Diagram
 ├── src/
-│   ├── app/
-│   │   ├── layout.tsx            # Root layout (font, metadata, Toaster)
-│   │   ├── page.tsx              # Entry: LandingPage ⇄ MapWorkspace
-│   │   └── globals.css           # Tailwind 4 + theme + utilitas scrollbar
-│   ├── components/
+│   ├── app/                        # Next.js App Router
+│   │   ├── layout.tsx              # Root layout (font, metadata, Toaster)
+│   │   ├── page.tsx                # Entry: LandingPage ⇄ MapWorkspace
+│   │   └── globals.css             # Tailwind 4 + theme + utilitas scrollbar
+│   ├── common/                     # Reusable UI primitives & shared module
+│   │   ├── mapService.ts           #   MapService (jembatan React ↔ OpenLayers)
+│   │   └── *.tsx                   #   Komponen shadcn/ui (button, input, ...)
+│   ├── components/                 # Self-contained component units (PascalCase)
 │   │   ├── docs/
-│   │   │   └── MermaidDiagram.tsx  # Renderer Mermaid (lazy import)
+│   │   │   └── MermaidDiagram.tsx  #   Renderer Mermaid (lazy import)
 │   │   ├── landing/
-│   │   │   └── LandingPage.tsx     # Landing page (hero, fitur, dokumentasi)
-│   │   ├── map/                    # Komponen aplikasi peta (reusable)
-│   │   │   ├── MapWorkspace.tsx    # Shell aplikasi: header + peta + panel
-│   │   │   ├── MapCanvas.tsx       # Container render OpenLayers
-│   │   │   ├── ConversionPanel.tsx # Form konversi DMS⇄DD + Add To Maps
-│   │   │   └── FloatingButton.tsx  # Tombol mengambang pembuka panel
-│   │   └── ui/                     # Komponen shadcn/ui
-│   ├── lib/
-│   │   ├── coordinates/            # Star Library konversi murni (testable)
-│   │   │   ├── types.ts            #   Tipe & CoordinateValidationError
-│   │   │   ├── validate.ts         #   assertValidDms / assertValidDd
-│   │   │   ├── dms-to-dd.ts        #   dmsToDd / formatDd
-│   │   │   ├── dd-to-dms.ts        #   ddToDms / formatDms
-│   │   │   └── index.ts            #   Barrel export
-│   │   ├── docs/
-│   │   │   └── diagrams.ts         # Sumber Mermaid untuk landing page
-│   │   └── ol/
-│   │       └── map-service.ts      # MapService (jembatan React ↔ OpenLayers)
-│   └── __tests__/                  # Unit test Jest
+│   │   │   ├── LandingPage.tsx     #   Landing page (hero, fitur, dokumentasi)
+│   │   │   └── EarthGlobe.tsx      #   Model 3D Bumi (React Three Fiber)
+│   │   └── map/
+│   │       ├── MapWorkspace.tsx    #   Shell aplikasi: header + peta + panel
+│   │       ├── MapCanvas.tsx       #   Container render OpenLayers
+│   │       ├── ConversionPanel.tsx #   Form konversi DMS⇄DD + Add To Maps
+│   │       └── FloatingButton.tsx  #   Tombol mengambang pembuka panel
+│   ├── constants/                  # Global constants (*.constants.ts)
+│   │   ├── coordinates.constants.ts #  Batas derajat/menit & faktor pembulatan
+│   │   ├── mapConfig.constants.ts   #  Center & zoom default peta
+│   │   └── diagrams.constants.ts    #  Sumber Mermaid untuk landing page
+│   ├── hooks/                      # Reusable hooks (camelCase, prefix `use`)
+│   │   ├── useMobile.ts            #   Deteksi viewport mobile
+│   │   └── useToast.ts             #   Toast store + hook
+│   ├── store/                      # Zustand store (state management)
+│   │   ├── map.store.ts            #   Vanilla store (panel & marker)
+│   │   └── useMapStore.ts          #   React hook adapter
+│   ├── types/                      # Global types & DTOs (*.types.ts)
+│   │   ├── coordinate.types.ts     #   Axis, DmsCoordinate, error validasi
+│   │   └── geo.types.ts            #   LonLat, CenterChangeHandler, MapMarker
+│   └── utils/                      # Pure utilities (+ colocated tests)
+│       ├── cn.ts                   #   Penggabung className (clsx + tailwind-merge)
+│       └── coordinates/            #   Star Library konversi murni (testable)
+│           ├── dmsToDd.ts          #     dmsToDd / formatDd
+│           ├── dmsToDd.test.ts     #     Unit test dmsToDd & formatDd
+│           ├── ddToDms.ts          #     ddToDms / formatDms
+│           ├── ddToDms.test.ts     #     Unit test ddToDms & formatDms
+│           ├── validate.ts         #     assertValidDms / assertValidDd
+│           ├── format.test.ts      #     Unit test formatDd / formatDms
+│           ├── roundtrip.test.ts   #     Unit test invariansi DMS ⇄ DD
+│           └── index.ts            #     Barrel export
 ├── jest.config.ts
 └── README.md
 ```
+
+Struktur di atas mengikuti **Frontend Guidelines** pada `docs/readme.md`:
+folder `kebab-case`, file umum `camelCase`, komponen `PascalCase`,
+hook `use*` `camelCase`, serta suffix `.types.ts`, `.constants.ts`,
+`.store.ts`, dan `.test.ts` dengan unit test *colocated* di samping kodenya.
 
 Komponen dipisah per-tanggung-jawab (**reusable & mudah dibaca**):
 library konversi sengaja *pure* (tanpa React/DOM) agar mudah diuji,

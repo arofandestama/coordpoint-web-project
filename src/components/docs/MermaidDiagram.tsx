@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { Skeleton } from '@/common/skeleton';
+import { cn } from '@/utils/cn';
 
 export interface MermaidDiagramProps {
   /** Unique base id used for the mermaid render id. */
